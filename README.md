@@ -1,44 +1,80 @@
-# web-server-configurations
+# Server Setup with Apache Modules
+Now that you have experience enabling/adding Apache modules we will take another step with Apache configuration. For this lab we will use some of the modules covered during the 10/18/21 [lecture](https://github.com/CIT384/class-material/tree/main/LectureNotes). 
 
-Now that you have a basic understanding of how web servers work it's time to put that knowledge into practice. We have implemented our resume file to be served in multiple places, locally, ssh.sandbox.csun.edu and in a container on cit384-<UID> VM's.  
+## What are Apache modules?
+Modules are service programs that can be dynamically linked and loaded to extend the nature of the HTTP Server.
 
-If you are curious about available [apache modules](https://httpd.apache.org/docs/2.4/mod/)
+In this way, the Apache modules provide a way to extend the function of a Web server. Functions commonly added by optional modules include:
+- Rewrite Rules
+- Authentication
+- Encryption
+- Application support
+- Logging
+- Support for different content types
+- Diagnostic support
 
+## Some Common Modules/Rules
+- UserDir
+- Alias
+- AliasMatch
+- Redirect - Permanent, Temp
+- [List of Apache Modules](https://httpd.apache.org/docs/2.4/mod/)
 
-# Submission
-The following files should be commited to your repository:
- - Dockerfile
- - index.html
+# Background
+You were hired by a startup company and management has recently changed. You have been tasked with creating a company website. 
 
 # Assignment Steps
-For the previous containerized-website lab you used the `httpd` base image. Using the `httpd` image as the base meant that you did not have to worry about installing or configuring the apache server, it just worked out of the box.  
-This time around you will be `installing apache` and not relying on a pre-built image. 
+1. Build a splash page for your company
+   - Come up with a company name and a simple product
+   - Build a simple web page for this compnay
+   - Install/place this web page at the [DocumentRoot](https://httpd.apache.org/docs/2.4/mod/core.html#documentroot) location of your web server
+Curious about where your DocumentRoot is look at your apache virtual host files.
+2. Build a simple company directory
+   - Come up with 5 fictitious sales individuals for you company
+   - Create 5 user accounts associated for each contact
+   - Create a simple splash page for each contact
+   ```
+   # Your directory structure will look something like:
+   /home/
+   - user1/public_html/index.html 
+   - user2/public_html/index.html
+   - user3/public_html/index.html
+   - user4/public_html/index.html
+   - user5/public_html/index.html
+   ```
+   - Create Alias directives for each of these contacts
+   Each user page should be visible by going to:
+   ` localhost:8080/~$USER`
+   - Create Alias directives for each of these contacts
+3. Delegate a portion of the web space to the marketing team
+   - Marketing takes control of `"/"` and `"/promotions"`
+   - Create an Alias to reposition DocumentRoot
+4. The most common errors to create pages for, are Page Not Found (404) Forbidden and Access Denied (403)
+   - Create custom error page for 404 requests `forbidden.html`
+   - Create custom error page for 403 requests `not-found.html`
+   - Update vHost (virtual Host) to use your custom Error Documents
+Hint: [Custom Error Response](https://httpd.apache.org/docs/2.4/en/custom-error.html)
 
-You may use any base OS and your Dockerfile should contain the following: 
- - Installation of packages/modules
-   - Apache
-   - Enable [UserDir](https://httpd.apache.org/docs/2.4/howto/public_html.html) Module
-   - Enable [DirectoryIndex](https://httpd.apache.org/docs/2.4/mod/mod_dir.html) Module
-   - Any additional packages you might need to complete the assignment
- - Configuration of apache to use the modules
- - Add yourself as a user
- - Copy your resume site to the correct location
- - Use a CMD statement to start apache when a container is created
-   - `CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]`
+![Example Custom 404](assets/404.png)
 
+5. The company has been sold and you need to come up with a new company name
+   - Force a redirect to the new company name
+# Submission
+You will commit the following files:  
+- Main splash page (index.html)
+- The splash pages for each user
+- Updated vhost (virtual host) file containing all the required Alias, RewriteRule and etc...
+- forbidden.html 
+- not-found.html 
 
-# Testing
-Once you have finished your dockerfile you should build and test your image locally.   
-```
-docker build -t my_new_resume git@github.com:smf-steve/<blah>.git 
-docker run -dit --name new_resume.site -p 8080:80 my_new_resume 
+# Extra Steps
+Optional: Create a custom image using Docker which does all the steps listed above. 
+It would contain the following:
+1. Copy main splash page (index.html) file into DocumentRoot
+2. Add 5 users
+3. Copy each users splash page into the appropriate user space
+4. Copy updated Vhost file into the appropriate location
+5. Copy custom error pages into the appropriate location
+6. Start apache
 
-Then open a browser and test:  
-http://localhost:8080/~<$UID>/   
-```
-
-An example:
-![localhost example](assets/Apache-Example.png)
-Once everything works as expected you will log into your cit384-UID VM's and deploy your updated image. 
-
-All the commands needed to build images, create, start and exec into containers are listed on previous labs (as well as Google). 
+If you choose to use the docker version make sure to submit your Dockerfile along with all the necessary files used in your COPY commands. 
